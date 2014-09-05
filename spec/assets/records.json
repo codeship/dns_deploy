@@ -1,0 +1,8 @@
+[
+  { "zone": "example.com",
+    "records": [
+      { "name": "", "type": "MX", "value": "alt1.aspmx.l.google.com", "prio": 5, "ttl":300 },
+      { "name": "", "type": "MX", "value": "alt2.aspmx.l.google.com", "prio": 5, "ttl":300 }
+    ]
+  }
+]
