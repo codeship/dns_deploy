@@ -1,6 +1,5 @@
 require 'json'
 require 'dnsimple'
-require 'pry'
 
 require_relative 'dnsdeploy/version'
 require_relative 'dnsdeploy/local'
