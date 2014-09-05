@@ -1,11 +1,17 @@
 module Dnsdeploy
   class Base
-    def initialize(args)
-      @records_file = File.new(args.first)
+    def initialize(records_file)
+      @records_file = File.new(records_file)
     end
 
-    def self.update_records(args)
-      self.new(args).update_records
+    def self.update_records(records_file)
+      self.new(records_file).update_records
+    end
+
+    def validate
+      JSON.load(@records_file_path.read)
+    rescue => e
+      puts "unable to parse #{@records_file.path}".red
     end
 
     def update_records

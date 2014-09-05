@@ -1,3 +1,7 @@
 require_relative '../lib/dnsdeploy'
 
-Dnsdeploy::Base.update_records(ARGV)
+records_file = ARGV.first
+
+deployer = Dnsdeploy::Base.new(records_file)
+deployer.validate
+deployer.update_records
