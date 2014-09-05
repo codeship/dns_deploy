@@ -1,0 +1,3 @@
+require_relative '../lib/dnsdeploy'
+
+Dnsdeploy::Base.update_records(ARGV)

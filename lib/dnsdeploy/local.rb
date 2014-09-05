@@ -1,0 +1,42 @@
+require 'singleton'
+
+module Dnsdeploy
+  class Local
+    def initialize(records_file_path)
+      @records_file_path = records_file_path
+    end
+
+    def all_records
+      @all_records ||= json.map do |record_set|
+        domain = dnsimple_domain(record_set['zone'])
+        create_records(domain, record_set['records'])
+      end.flatten
+    end
+
+    def records(domain)
+      all_records.select { |r| r.domain.name == domain.name }
+    end
+
+    def domains
+      @domains ||= json.map do |record_set|
+        domain = dnsimple_domain(record_set['zone'])
+      end
+    end
+
+    def create_records(domain, json_records)
+      json_records.map do |record|
+        Record.new(domain: domain, name: record['name'], record_type: record['type'],
+          content: record['value'], ttl: record['ttl'], prio: record['prio'])
+      end
+    end
+
+    def json
+      @json ||= JSON.load(@records_file_path.read)
+    end
+
+    def dnsimple_domain(zone)
+      @dnsimple_domains ||= {}
+      @dnsimple_domains[zone] ||= DNSimple::Domain.all.select { |d| d.name == zone }.first
+    end
+  end
+end
