@@ -9,7 +9,8 @@ module Dnsdeploy
     end
 
     def validate
-      JSON.load(@records_file_path.read)
+      JSON.load(@records_file.read)
+      puts "#{@records_file.path} is valid json".green
     rescue => e
       puts "unable to parse #{@records_file.path}".red
     end
