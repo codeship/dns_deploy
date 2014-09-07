@@ -2,8 +2,8 @@ require 'singleton'
 
 module Dnsdeploy
   class Local
-    def initialize(records_file_path)
-      @records_file_path = records_file_path
+    def initialize(local_records_json)
+      @local_records_json = local_records_json
     end
 
     def all_records
@@ -31,7 +31,7 @@ module Dnsdeploy
     end
 
     def json
-      @json ||= JSON.load(@records_file_path.read)
+      @json ||= JSON.load(@local_records_json)
     end
 
     def dnsimple_domain(zone)

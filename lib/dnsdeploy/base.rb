@@ -1,18 +1,19 @@
 module Dnsdeploy
   class Base
-    def initialize(records_file)
-      @records_file = File.new(records_file)
+    def initialize(records_file_path)
+      @records_file_path = records_file_path
+      @local_records_json = File.new(records_file_path).read
     end
 
-    def self.update_records(records_file)
-      self.new(records_file).update_records
+    def self.update_records(records_file_path)
+      self.new(records_file_path).update_records
     end
 
     def validate
-      JSON.load(@records_file.read)
-      puts "#{@records_file.path} is valid json".green
+      JSON.load(@local_records_json)
+      puts "#{@records_file_path} is valid json".green
     rescue => e
-      puts "unable to parse #{@records_file.path}".red
+      puts "unable to parse #{@records_file_path}".red
     end
 
     def update_records
@@ -39,7 +40,7 @@ module Dnsdeploy
     end
 
     def local
-      @local ||= Dnsdeploy::Local.new(@records_file)
+      @local ||= Dnsdeploy::Local.new(@local_records_json)
     end
   end
 end
