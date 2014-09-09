@@ -1,29 +1,17 @@
-# Dnsdeploy
+# DNSdeploy
 
-TODO: Write a gem description
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'dnsdeploy'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install dnsdeploy
+Continuous Deployment for your DNS Records
 
 ## Usage
 
-TODO: Write usage instructions here
+We wrote a [blog post][blogpost] on how to use dns-deploy with DNSimple.
+
+Example repository
+
+[blogpost]: http://blog.codeship.io/2014/09/09/continuous-deployment-of-dns-records-with-dnsimple.html
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/dnsdeploy/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+see [CONTRIBUTING.md][contributing]
+
+[contributing]: https://github.com/beanieboi/ffprober/blob/master/CONTRIBUTING.md
