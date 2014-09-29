@@ -1,46 +1,64 @@
+require 'dnsdeploy/util'
+
 module Dnsdeploy
   class Base
-    def initialize(records_file_path)
-      @records_file_path = records_file_path
-      @local_records_json = File.new(records_file_path).read
-    end
+    include Util
 
     def self.update_records(records_file_path)
       self.new(records_file_path).update_records
     end
 
-    def validate
-      JSON.load(@local_records_json)
-      puts "#{@records_file_path} is valid json".green
-    rescue => e
-      puts "unable to parse #{@records_file_path}".red
-    end
+    def initialize(records_file_path)
+      @records_file_path = records_file_path
 
-    def update_records
-      local.domains.each do |domain|
-        puts "[Processing] Domain #{domain.name}"
-
-        # Delete records on DNSimple
-        DNSimple::Record.all(domain).collect(&:destroy)
-
-        # create records
-        local.records(domain).each do |record|
-          puts "[CREATE] #{record}".green
-          begin
-            DNSimple::Record.create(record.domain, record.name, record.record_type,
-              record.content, { ttl: record.ttl, prio: record.prio })
-          rescue DNSimple::RequestError => e
-            puts "[ERROR] #{e} #{record}".red
-            @exit = 1
-          end
-        end
-
-        exit(@exit) if @exit
+      @local_records_json = LazyLoader.create_lazy_loader do
+        File.new(@records_file_path).read
+      end
+      @local = LazyLoader.create_lazy_loader do
+        Dnsdeploy::Local.new(@local_records_json.get)
+      end
+      @valid = LazyLoader.create_lazy_loader do
+        _validate_json(@local_records_json.get, @records_file_path.get)
       end
     end
 
-    def local
-      @local ||= Dnsdeploy::Local.new(@local_records_json)
+    def validate
+      @valid.get
+    end
+
+    def update_records
+      @local.get.domains.each do |domain|
+        log "[Processing] Domain #{domain.name}"
+        # Delete records on DNSimple
+        DNSimple::Record.all(domain).collect(&:destroy)
+        # create records
+        exit 1 if @local.get.records(domain).map(&:_dnsimple_record_create).include?(false)
+      end
+    end
+
+    private
+
+    def _dnsimple_record_create(record)
+      log "[CREATE] #{record}".green
+      begin
+        DNSimple::Record.create(record.domain, record.name, record.record_type,
+          record.content, { ttl: record.ttl, prio: record.prio })
+        true
+      rescue DNSimple::RequestError => e
+        log "[ERROR] #{e} #{record}".red
+        false
+      end
+    end
+
+    def _validate_json(json, file_path = nil)
+      begin
+        JSON.load(json)
+        log "#{file_path || "Input JSON"} is valid json".green
+        true
+      rescue => e
+        log "unable to parse #{file_path || "input JSON"}".red
+        false
+      end
     end
   end
 end
