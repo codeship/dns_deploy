@@ -28,15 +28,19 @@ module Dnsdeploy
 
     def update_records
       @local.get.domains.each do |domain|
-        log "[Processing] Domain #{domain.name}"
-        # Delete records on DNSimple
-        DNSimple::Record.all(domain).collect(&:destroy)
-        # create records
-        exit 1 if @local.get.records(domain).map(&:_dnsimple_record_create).include?(false)
+        exit 1 unless _update_record(domain)
       end
     end
 
     private
+
+    def _update_record(domain)
+        log "[Processing] Domain #{domain.name}"
+        # Delete records on DNSimple
+        DNSimple::Record.all(domain).collect(&:destroy)
+        # create records, return false if there was a false
+        !@local.get.records(domain).map(&:_dnsimple_record_create).include?(false)
+    end
 
     def _dnsimple_record_create(record)
       log "[CREATE] #{record}".green
