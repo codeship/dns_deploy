@@ -14,6 +14,7 @@ module Dnsdeploy
       puts "#{@records_file_path} is valid json".green
     rescue => e
       puts "unable to parse #{@records_file_path}".red
+      exit(1)
     end
 
     def update_records
