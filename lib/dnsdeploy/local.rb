@@ -18,8 +18,9 @@ module Dnsdeploy
     end
 
     def domains
-      @domains ||= json.map do |record_set|
-        domain = dnsimple_domain(record_set['zone'])
+      @domains ||= json.inject({}) do |memo, record_set|
+        memo[record_set['zone']] = dnsimple_domain(record_set['zone'])
+        memo
       end
     end
 
